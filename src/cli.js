@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const Api = require('./Api');
+const fs = require('fs');
 
 
 const args = process.argv.slice(2);
@@ -8,7 +9,7 @@ const args = process.argv.slice(2);
 if (args.includes('-h') || args.includes('--help')) {
   console.log([
     'fast-speedtest - speed test powered by fast.com',
-    'usage: fast-speedtest token [-T] [-v, --verbose] [-r, --raw] [-n, --no-https] [-t, --timeout timeout] [-c, --count url-count] [-b, --buffer buffer-size] [-u, --unit output-unit] [-p, --proxy proxy]',
+    'usage: fast-speedtest token [-T] [-v, --verbose] [-r, --raw] [-n, --no-https] [-f, --targetfile targetfile] [-t, --timeout timeout] [-c, --count url-count] [-b, --buffer buffer-size] [-u, --unit output-unit] [-p, --proxy proxy]',
   ].join('\n'));
   process.exit(0);
 }
@@ -49,6 +50,7 @@ const urlCount = getArgParam('-c', '--count');
 const bufferSize = getArgParam('-b', '--buffer');
 const unitName = getArgParam('-u', '--unit');
 const proxy = getArgParam('-p', '--proxy');
+const targetfile = getArgParam('-f', '--targetfile');
 if (unitName && !(unitName in Api.UNITS)) {
   throw new Error(`Unit not valide, must be one of ${Object.keys(Api.UNITS)}`);
 }
@@ -72,7 +74,16 @@ if (getTargOnly) {
         console.error(e.message);
     });
 } else {
-    api.getSpeed().then((s) => {
+    let targets;
+    if (targetfile) {
+        fs.readFile(targetfile, 'utf8', (err, data) => {
+            if (err) throw err;
+            targets = eval(data);
+            console.log(targets);
+        });
+    }
+
+    api.getSpeed(targets).then((s) => {
       if (rawOutput) {
         console.log(s);
       } else {

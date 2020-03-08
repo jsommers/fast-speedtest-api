@@ -172,12 +172,13 @@ class Api {
    *
    * @returns {Promise<number>} Speed in selected unit (Default: Bps)
    */
-  async getSpeed() {
-    let targets = null;
-    try {
-      targets = await this.getTargets();
-    } catch (e) {
-      throw e;
+  async getSpeed(targets) {
+    if (!targets) {
+        try {
+            targets = await this.getTargets();
+        } catch (e) {
+            throw e;
+        }
     }
 
     let bytes = 0;
