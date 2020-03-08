@@ -8,7 +8,7 @@ const args = process.argv.slice(2);
 if (args.includes('-h') || args.includes('--help')) {
   console.log([
     'fast-speedtest - speed test powered by fast.com',
-    'usage: fast-speedtest token [-v, --verbose] [-r, --raw] [-n, --no-https] [-t, --timeout timeout] [-c, --count url-count] [-b, --buffer buffer-size] [-u, --unit output-unit] [-p, --proxy proxy]',
+    'usage: fast-speedtest token [-T] [-v, --verbose] [-r, --raw] [-n, --no-https] [-t, --timeout timeout] [-c, --count url-count] [-b, --buffer buffer-size] [-u, --unit output-unit] [-p, --proxy proxy]',
   ].join('\n'));
   process.exit(0);
 }
@@ -42,6 +42,7 @@ if (token && typeof token !== 'string') {
 const verbose = restArgs.includes('-v') || restArgs.includes('--verbose');
 const https = !restArgs.includes('-n') && !restArgs.includes('--no-https');
 const rawOutput = restArgs.includes('-r') || restArgs.includes('--raw');
+const getTargOnly = restArgs.includes('-T');
 
 const timeout = getArgParam('-t', '--timeout');
 const urlCount = getArgParam('-c', '--count');
@@ -64,12 +65,20 @@ const api = new Api({
   proxy,
 });
 
-api.getSpeed().then((s) => {
-  if (rawOutput) {
-    console.log(s);
-  } else {
-    console.log(`Speed: ${Math.round(s * 100) / 100} ${unit.name}`);
-  }
-}).catch((e) => {
-  console.error(e.message);
-});
+if (getTargOnly) {
+    api.getTargets().then((t) => {
+        console.log(t);
+    }).catch((e) => {
+        console.error(e.message);
+    });
+} else {
+    api.getSpeed().then((s) => {
+      if (rawOutput) {
+        console.log(s);
+      } else {
+        console.log(`Speed: ${Math.round(s * 100) / 100} ${unit.name}`);
+      }
+    }).catch((e) => {
+      console.error(e.message);
+    });
+}
