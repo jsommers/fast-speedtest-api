@@ -9,6 +9,8 @@
 A speed test powered by fast.com  
 From scratch, with no dependencies
 
+The original repo has been edited to fork from getting a token for each test, and to decouple the target gathering and speed test capabilities.
+
 ## Installation
 ```bash
 $ npm install --save fast-speedtest-api
